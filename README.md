@@ -1,5 +1,7 @@
 # Emotion Studio
 
+**Live:** https://petrain.github.io/emotion-studio/ — click **Connect**, enter your Speech resource region and key. Keys stay in your browser and go only to Azure.
+
 An emotion-first playground for Azure Speech: pick a model, locale, and voice, spin the emotion wheel, and hear the same line performed in each style.
 
 Supported models:
