@@ -616,7 +616,7 @@ $('forgetKey').addEventListener('click', () => {
   try { sessionStorage.removeItem('es.key'); } catch { /* blocked */ }
   state.auth.key = ''; $('key').value = '';
   cache.clear();
-  fetch('api/config').then((r) => (r.ok ? r.json() : null)).then((cfg) => { state.auth.proxy = !!cfg?.proxy; updateConn(); }).catch(updateConn);
+  if (isLocal) fetch('api/config').then((r) => (r.ok ? r.json() : null)).then((cfg) => { state.auth.proxy = !!cfg?.proxy; updateConn(); }).catch(updateConn);
   updateConn();
   connStatus('Key removed from this browser.');
 });
@@ -655,7 +655,9 @@ if (!line.value) setSampleLine(0);
 const firstIdx = state.styles.indexOf('excited');
 if (!sel && firstIdx > 0) { state.pos = state.target = firstIdx; state.committed = -1; commit(firstIdx, false); }
 
-fetch('api/config').then((r) => (r.ok ? r.json() : null)).then((cfg) => {
+// The server.js proxy only exists when running locally; static hosts (GitHub Pages) skip the probe.
+const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+(isLocal ? fetch('api/config') : Promise.reject()).then((r) => (r.ok ? r.json() : null)).then((cfg) => {
   if (cfg?.proxy && !state.auth.key) { state.auth.proxy = true; state.auth.region = cfg.region || state.auth.region; }
   updateConn();
   if (state.auth.proxy || state.auth.key) syncVoices(state.auth.proxy ? {} : state.auth).catch(() => {});
