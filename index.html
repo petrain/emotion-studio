@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Emotion Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="aura" id="aura"></div>
+
+  <main class="card">
+    <header class="top">
+      <div class="brand"><span class="bars">||</span>Emotion Studio <span class="dim">· for Azure Speech</span></div>
+
+      <div class="picker" role="group" aria-label="Voice selection">
+        <label><span>Model</span><select id="model"></select></label>
+        <label><span>Locale</span><select id="locale"></select></label>
+        <label><span>Voice</span><select id="voice"></select></label>
+      </div>
+
+      <button class="conn-btn" id="settingsBtn" aria-label="Azure Speech connection settings">
+        <span class="dot" id="connDot"></span><span id="connLabel">Connect</span>
+      </button>
+    </header>
+
+    <section class="stage">
+      <div class="orb-wrap">
+        <canvas id="orb"></canvas>
+        <div class="orb-caption" id="orbCaption"></div>
+      </div>
+
+      <div class="wheel" id="wheel" tabindex="0" aria-label="Emotion wheel. Use arrow keys or scroll to choose an emotion.">
+        <div class="wheel-items" id="wheelItems"></div>
+        <div class="active-row" id="activeRow">
+          <span class="tag" id="activeTag">[ Neutral ]</span>
+          <div class="line-wrap">
+            <textarea id="line" rows="1" spellcheck="false" aria-label="Line to speak"></textarea>
+            <div class="line-overlay" id="lineOverlay" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bottom">
+      <div class="copy">
+        <h1 id="headline">Feel every word</h1>
+        <h2 id="subhead">MAI-Voice-2.1 · en-US Harper</h2>
+        <p id="blurb"></p>
+        <div class="actions">
+          <button class="btn primary" id="speakBtn"><span id="speakIcon">▶</span> <span id="speakLabel">Speak</span></button>
+          <button class="btn" id="sweepBtn" title="Play this line through neighbouring emotions">Emotion sweep</button>
+          <button class="btn" id="ssmlBtn">SSML</button>
+          <button class="btn ghost" id="shuffleBtn" title="Try another sample line">↻ Line</button>
+          <a class="btn ghost" id="downloadBtn" download hidden>↓ MP3</a>
+        </div>
+      </div>
+
+      <div class="tools">
+        <div class="para" id="para" hidden>
+          <span class="tools-label">Insert</span>
+          <div id="paraChips" class="chips"></div>
+        </div>
+        <div class="temp" id="tempRow" hidden>
+          <span class="tools-label">Temperature</span>
+          <input type="range" id="temp" min="0.3" max="1" step="0.05" value="0.7" />
+          <output id="tempOut">0.70</output>
+        </div>
+        <label class="toggle"><input type="checkbox" id="autoplay" checked /> Auto-play on emotion change</label>
+        <div class="hint" id="hint"></div>
+      </div>
+    </footer>
+
+    <aside class="ssml-panel" id="ssmlPanel" hidden>
+      <div class="ssml-head"><strong>SSML</strong><span><button class="btn small" id="copySsml">Copy</button><button class="btn small ghost" id="closeSsml">✕</button></span></div>
+      <pre id="ssmlOut"></pre>
+    </aside>
+  </main>
+
+  <dialog id="settings">
+    <form method="dialog" class="settings" id="settingsForm">
+      <h3>Connect to Azure Speech</h3>
+      <p class="muted" id="proxyNote"></p>
+      <label>Region
+        <input id="region" list="regionList" autocomplete="off" spellcheck="false" placeholder="e.g. eastus — or paste your endpoint URL" />
+        <datalist id="regionList"></datalist>
+      </label>
+      <label>Speech resource key
+        <span class="key-field">
+          <input type="password" id="key" autocomplete="off" spellcheck="false" placeholder="Paste Key 1 or Key 2" />
+          <button class="btn small ghost" type="button" id="toggleKey">Show</button>
+        </span>
+      </label>
+      <label class="check"><input type="checkbox" id="rememberKey" checked /> Remember on this device</label>
+      <p class="muted small">Find both values in the Azure portal → your Speech resource → <em>Keys and Endpoint</em>. The key is sent only to <code>&lt;region&gt;.tts.speech.microsoft.com</code>. Untick “Remember” to keep it for this tab only. This is an independent demo, not a Microsoft product.</p>
+      <div class="status" id="connStatus" role="status"></div>
+      <div class="row between">
+        <span class="row">
+          <button class="btn" id="testConn" type="button">Test</button>
+          <button class="btn ghost" id="forgetKey" type="button">Forget key</button>
+        </span>
+        <span class="row">
+          <button class="btn ghost" type="button" id="cancelSettings">Cancel</button>
+          <button class="btn primary" id="saveSettings" type="submit">Save &amp; connect</button>
+        </span>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="data.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
