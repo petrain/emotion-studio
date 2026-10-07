@@ -37,6 +37,10 @@ The page is plain static files with no build step and no dependencies. Opening `
 - **SSML panel** with Copy, and an **MP3 download** of the last take.
 - **Live catalog sync**: once connected, the app loads `voices/list` from your resource (cached for 24 hours). It picks up new MAI and HD voices along with their `StyleList`. The doc tables in `data.js` are the offline fallback.
 
+## Deploying
+
+GitHub Pages lets browsers cache files for up to 10 minutes. Before pushing a change, run `sh scripts/bump-version.sh`; it stamps a new `?v=` on every asset link so visitors get matching, fresh files.
+
 ## Files
 
 - `index.html`, `styles.css`: layout. Light and dark themes, responsive down to phone width.
@@ -44,3 +48,4 @@ The page is plain static files with no build step and no dependencies. Opening `
 - `app.js`: wheel physics, SSML builder, synthesis, playback, and sync.
 - `orb.js`: WebGL orb shader.
 - `server.js`: zero-dependency static server and `/api/tts` + `/api/voices` proxy.
+- `scripts/bump-version.sh`: cache-busting version stamp for deploys.
