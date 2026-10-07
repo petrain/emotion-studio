@@ -72,6 +72,10 @@ body {
   background-position: right 4px center, right 0 center; background-size: 4px 4px; background-repeat: no-repeat;
 }
 .picker select:focus-visible { outline: 2px solid var(--accent); border-radius: 4px; }
+/* The open list is drawn by the browser on its own surface; give options explicit theme colors
+   so dark mode doesn't put light text on a white list. */
+.picker select option { background-color: var(--card); color: var(--ink); }
+.picker select option:checked { background-color: var(--chip); }
 .conn-btn {
   flex: none; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; cursor: pointer;
   border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-weight: 500;
