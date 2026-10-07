@@ -79,33 +79,53 @@
     </aside>
   </main>
 
-  <dialog id="settings">
+  <dialog id="settings" aria-labelledby="settingsTitle">
     <form method="dialog" class="settings" id="settingsForm">
-      <h3>Connect to Azure Speech</h3>
-      <p class="muted" id="proxyNote"></p>
-      <label>Region
-        <input id="region" list="regionList" autocomplete="off" spellcheck="false" placeholder="e.g. eastus — or paste your endpoint URL" />
-        <datalist id="regionList"></datalist>
-      </label>
-      <label>Speech resource key
-        <span class="key-field">
-          <input type="password" id="key" autocomplete="off" spellcheck="false" placeholder="Paste Key 1 or Key 2" />
-          <button class="btn small ghost" type="button" id="toggleKey">Show</button>
-        </span>
-      </label>
-      <label class="check"><input type="checkbox" id="rememberKey" checked /> Remember on this device</label>
-      <p class="muted small">Find both values in the Azure portal → your Speech resource → <em>Keys and Endpoint</em>. The key is sent only to <code>&lt;region&gt;.tts.speech.microsoft.com</code>. Untick “Remember” to keep it for this tab only. This is an independent demo, not a Microsoft product.</p>
-      <div class="status" id="connStatus" role="status"></div>
-      <div class="row between">
-        <span class="row">
-          <button class="btn" id="testConn" type="button">Test</button>
-          <button class="btn ghost" id="forgetKey" type="button">Forget key</button>
-        </span>
-        <span class="row">
+      <header class="dlg-head">
+        <p class="eyebrow" id="settingsEyebrow" hidden>Welcome to Emotion Studio</p>
+        <h3 id="settingsTitle">Connect your Azure Speech resource</h3>
+        <p class="muted" id="proxyNote"></p>
+      </header>
+
+      <div class="fields">
+        <label for="region">Region
+          <input id="region" list="regionList" autocomplete="off" spellcheck="false" placeholder="eastus, or paste your endpoint URL" />
+          <datalist id="regionList"></datalist>
+        </label>
+        <label for="key">Key
+          <span class="key-field">
+            <input type="password" id="key" autocomplete="off" spellcheck="false" placeholder="Paste Key 1 or Key 2" />
+            <button class="btn small ghost" type="button" id="toggleKey" aria-controls="key">Show</button>
+          </span>
+        </label>
+        <div class="saved" id="savedKey" hidden>
+          <span id="savedKeyText"></span>
+          <button type="button" class="link-btn" id="forgetKey">Forget key</button>
+        </div>
+        <label class="check" for="rememberKey"><input type="checkbox" id="rememberKey" checked /> Remember on this device</label>
+      </div>
+
+      <details class="help" id="keyHelp">
+        <summary>Where do I find these?</summary>
+        <ol>
+          <li>Open your Speech resource in the <a href="https://portal.azure.com/" target="_blank" rel="noopener">Azure portal</a>. No resource yet? <a href="https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices" target="_blank" rel="noopener">Create one</a>; the free tier works.</li>
+          <li>Go to <em>Resource Management → Keys and Endpoint</em>.</li>
+          <li>Copy <em>Key 1</em> and the <em>Location/Region</em> value (for example <code>eastus</code>).</li>
+        </ol>
+        <p class="muted small">MAI-Voice-2.1 runs in eastus, eastus2, westus, westus2, westus3, canadacentral, westeurope, northeurope, francecentral, swedencentral, centralindia, eastasia, southeastasia and japaneast.</p>
+      </details>
+
+      <p class="fineprint">Your key stays in this browser and is sent only to <code>&lt;region&gt;.tts.speech.microsoft.com</code>. Untick “Remember” to keep it for this tab only. Independent demo, not a Microsoft product.</p>
+
+      <div class="status" id="connStatus" role="status" hidden></div>
+
+      <footer class="dlg-foot">
+        <button class="btn ghost" id="testConn" type="button">Test</button>
+        <span class="dlg-actions">
           <button class="btn ghost" type="button" id="cancelSettings">Cancel</button>
           <button class="btn primary" id="saveSettings" type="submit">Save &amp; connect</button>
         </span>
-      </div>
+      </footer>
     </form>
   </dialog>
 

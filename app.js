@@ -544,7 +544,7 @@ $('voice').addEventListener('change', guarded(setVoice));
 
 /* ------------------------------------------------------------------ settings */
 const dlg = $('settings');
-const connStatus = (msg, kind = '') => { const el = $('connStatus'); el.textContent = msg; el.className = 'status ' + kind; };
+const connStatus = (msg, kind = '') => { const el = $('connStatus'); el.textContent = msg; el.className = 'status ' + kind; el.hidden = !msg; };
 
 // Accepts "eastus", "East US", "East US 2", or an endpoint URL such as https://eastus.api.cognitive.microsoft.com/
 function normalizeRegion(raw) {
@@ -553,19 +553,34 @@ function normalizeRegion(raw) {
   return (m ? m[1] : v).replace(/[\s_-]+/g, '');
 }
 
-function openSettings() {
+// `welcome` is the first-visit variant: same form, friendlier framing.
+function openSettings({ welcome = false } = {}) {
+  if (dlg.open) return;
   $('regionList').innerHTML = REGIONS.map((r) => `<option value="${r}">`).join('');
   $('region').value = state.auth.region;
   $('key').value = state.auth.key; $('key').type = 'password'; $('toggleKey').textContent = 'Show';
   $('rememberKey').checked = !state.auth.key || !!store.get('key', '');
-  $('proxyNote').textContent = state.auth.proxy
-    ? 'Currently using the key configured on the local server (server.js). A key entered here overrides it in this browser.'
-    : 'Paste your Speech resource region and key. Calls go straight from this page to Azure.';
-  connStatus(state.auth.key ? `Saved key ••••${state.auth.key.slice(-4)} · ${state.auth.region}` : '');
+  $('settingsEyebrow').hidden = !welcome;
+  $('cancelSettings').textContent = welcome ? 'Not now' : 'Cancel';
+  $('proxyNote').textContent = welcome
+    ? 'Hear one line performed in dozens of emotions with MAI-Voice-2.1 and Dragon HD voices. Bring your own Azure Speech key to start; it takes about a minute.'
+    : state.auth.proxy
+      ? 'Using the key configured on the local server. A key entered here overrides it in this browser.'
+      : 'Calls go straight from this page to Azure Speech.';
+  $('keyHelp').open = welcome;
+  showSavedKey();
+  connStatus('');
   dlg.showModal();
-  (state.auth.key ? $('region') : $('key')).focus();
+  (state.auth.key ? $('saveSettings') : $('key')).focus();
 }
-$('settingsBtn').addEventListener('click', openSettings);
+function showSavedKey() {
+  const has = !!state.auth.key;
+  $('savedKey').hidden = !has;
+  if (has) $('savedKeyText').textContent = `Saved key ••••${state.auth.key.slice(-4)} · ${state.auth.region}`;
+}
+// Any way the dialog closes (Save, Cancel, Esc) counts as having seen the welcome.
+dlg.addEventListener('close', () => store.set('welcomed', true));
+$('settingsBtn').addEventListener('click', () => openSettings());
 $('cancelSettings').addEventListener('click', () => dlg.close());
 $('toggleKey').addEventListener('click', () => {
   const show = $('key').type === 'password';
@@ -617,7 +632,7 @@ $('forgetKey').addEventListener('click', () => {
   state.auth.key = ''; $('key').value = '';
   cache.clear();
   if (isLocal) fetch('api/config').then((r) => (r.ok ? r.json() : null)).then((cfg) => { state.auth.proxy = !!cfg?.proxy; updateConn(); }).catch(updateConn);
-  updateConn();
+  updateConn(); showSavedKey();
   connStatus('Key removed from this browser.');
 });
 
@@ -661,6 +676,9 @@ const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   if (cfg?.proxy && !state.auth.key) { state.auth.proxy = true; state.auth.region = cfg.region || state.auth.region; }
   updateConn();
   if (state.auth.proxy || state.auth.key) syncVoices(state.auth.proxy ? {} : state.auth).catch(() => {});
-}).catch(updateConn);
+}).catch(updateConn).finally(() => {
+  // First visit with no way to synthesize: invite them to connect once the page has painted.
+  if (!state.auth.key && !state.auth.proxy && !store.get('welcomed', false)) setTimeout(() => openSettings({ welcome: true }), 500);
+});
 
 requestAnimationFrame(tick);
